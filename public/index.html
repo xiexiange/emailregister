@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Register</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <p class="eyebrow">Modular Domain Registration</p>
+        <h1>按邮箱后缀路由到独立注册模块</h1>
+        <p class="intro">
+          首页只负责选择邮箱后缀并发起统一请求，真正的注册逻辑由后端适配器按域名拆分处理。
+        </p>
+      </section>
+
+      <section class="panel">
+        <label class="field">
+          <span>邮箱后缀</span>
+          <select id="domainSelect"></select>
+        </label>
+
+        <button id="submitButton" class="primary-button">确认</button>
+
+        <p id="statusText" class="status-text">请选择一个后缀后发起注册。</p>
+
+        <div id="resultCard" class="result-card hidden">
+          <div>
+            <span class="result-label">账号</span>
+            <strong id="accountValue"></strong>
+          </div>
+          <div>
+            <span class="result-label">密码</span>
+            <strong id="passwordValue"></strong>
+          </div>
+          <div>
+            <span class="result-label">处理方式</span>
+            <strong id="providerValue"></strong>
+          </div>
+          <p id="detailValue" class="detail-text"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/public/app.js"></script>
+  </body>
+  </html>
