@@ -1,8 +1,10 @@
 const { domains } = require("../config/domains");
 const { MockMailAdapter } = require("./domains/mockmail");
 const { OfficialApiExampleAdapter } = require("./domains/official-api-example");
+const { MailSlurpAdapter } = require("./domains/mailslurp");
 
 const adapterFactories = {
+  mailslurp: (definition) => new MailSlurpAdapter(definition),
   mockmail: (definition) => new MockMailAdapter(definition),
   officialApiExample: (definition) => new OfficialApiExampleAdapter(definition)
 };

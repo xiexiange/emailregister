@@ -1,5 +1,11 @@
 const domains = [
   {
+    domain: "mailslurp.com",
+    adapter: "mailslurp",
+    label: "MailSlurp",
+    description: "通过 MailSlurp API 创建邮箱地址（支持默认域或自定义域参数）。"
+  },
+  {
     domain: "mockmail.dev",
     adapter: "mockmail",
     label: "Mock Mail",

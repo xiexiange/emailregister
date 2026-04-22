@@ -1,42 +1,73 @@
 # emailregister
 
-一个安全的“邮箱后缀路由注册”演示工程。
+This project is a modular email registration demo website.
 
-## 说明
+The homepage lets users select an email domain suffix and click `Confirm`.
+Backend registration logic is routed by domain, and each domain flow is implemented as an isolated adapter module.
 
-本项目提供的是通用架构，不包含针对第三方邮箱站点的自动化注册实现。
-后端仅内置：
-
-- `mockmail.dev` 的演示适配器
-- `example-api.com` 的授权 API 示例适配器
-
-如果你有自有邮箱系统或目标服务的官方授权接口，可以按域名新增独立模块接入。
-
-## 启动
+## Start
 
 ```bash
 npm.cmd start
 ```
 
-默认启动地址：
+Open:
 
 ```text
 http://localhost:3000
 ```
 
-## 架构
+## Architecture
 
-- `public/`：前端页面，负责选择域名并展示结果
-- `src/server.js`：统一 HTTP 服务与 API 入口
-- `src/config/domains.js`：域名到适配器的映射
-- `src/services/domains/`：每个域名独立注册模块，互不影响
-- `src/services/registrationService.js`：统一注册调度层
+- `public/`: Frontend page and interaction.
+- `src/server.js`: HTTP server and unified API endpoints.
+- `src/config/domains.js`: Domain-to-adapter mapping config.
+- `src/services/domainRegistry.js`: Adapter factory registry.
+- `src/services/domains/`: One independent module per provider.
 
-## 新增域名模块
+## Built-in providers
 
-1. 在 `src/services/domains/` 新建一个适配器文件
-2. 继承 `DomainRegistrationAdapter` 并实现 `register()`
-3. 在 `src/services/domainRegistry.js` 注册工厂
-4. 在 `src/config/domains.js` 配置域名与适配器映射
+- `mailslurp.com` -> `MailSlurp` adapter
+- `mockmail.dev` -> demo adapter
+- `example-api.com` -> template adapter for your own authorized service
 
-这样前端无需修改，只传域名即可。
+## MailSlurp integration
+
+This project uses MailSlurp official REST endpoint:
+
+- `POST /inboxes/withOptions`
+
+Configured in adapter:
+
+- file: `src/services/domains/mailslurp.js`
+- runtime mode by env var `MAILSLURP_CREATE_MODE`
+
+Supported modes:
+
+- `address`: request a specific address like `randomPrefix@mailslurp.com`
+- `domainId`: create inbox on your verified custom domain by `domainId`
+- `pool`: let MailSlurp choose from its domain pool
+- optional fallback: `MAILSLURP_FALLBACK_TO_POOL=true` retries with domain pool when `address` mode fails
+
+## Environment variables
+
+Copy `.env.example` to `.env`, then replace mock values:
+
+```env
+PORT=3000
+OFFICIAL_API_EXAMPLE_URL=
+MAILSLURP_API_KEY=your_real_api_key
+MAILSLURP_BASE_URL=https://api.mailslurp.com
+MAILSLURP_CREATE_MODE=address
+MAILSLURP_DOMAIN_ID=your_verified_domain_id
+MAILSLURP_INBOX_TYPE=HTTP_INBOX
+MAILSLURP_EXPIRES_IN=3600000
+MAILSLURP_FALLBACK_TO_POOL=true
+```
+
+`src/server.js` auto-loads `.env` at startup.
+
+## Notes
+
+- MailSlurp mailbox access is API-key based. The `password` field shown by this demo is a generated placeholder for your UI contract.
+- If you need real mailbox protocol credentials (IMAP/SMTP), add a second API call after inbox creation to fetch protocol access details.
