@@ -3,6 +3,7 @@ const submitButton = document.getElementById("submitButton");
 const statusText = document.getElementById("statusText");
 const resultCard = document.getElementById("resultCard");
 const accountValue = document.getElementById("accountValue");
+const inboxIdValue = document.getElementById("inboxIdValue");
 const passwordValue = document.getElementById("passwordValue");
 const providerValue = document.getElementById("providerValue");
 const detailValue = document.getElementById("detailValue");
@@ -52,6 +53,7 @@ async function registerAccount() {
     }
 
     accountValue.textContent = payload.account;
+    inboxIdValue.textContent = payload.inboxId || "-";
     passwordValue.textContent = payload.password;
     providerValue.textContent = `${payload.provider} / ${payload.mode}`;
     detailValue.textContent = payload.detail || "";

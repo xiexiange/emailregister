@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MailSlurp Mailbox</title>
+    <link rel="stylesheet" href="/public/mailbox.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <header class="topbar">
+        <h1>MailSlurp 收发邮件</h1>
+        <a href="/" class="link">返回注册页</a>
+      </header>
+
+      <section class="panel">
+        <h2>选择收件箱</h2>
+        <div class="row">
+          <button id="loadInboxesBtn" class="btn">加载收件箱列表</button>
+          <select id="inboxSelect"></select>
+        </div>
+        <div class="row">
+          <input id="emailInput" placeholder="输入邮箱地址并绑定，如 aaa@mailslurp.biz" />
+          <button id="bindByEmailBtn" class="btn">按邮箱绑定</button>
+          <button id="refreshEmailsBtn" class="btn">刷新邮件</button>
+        </div>
+        <div class="row">
+          <label class="checkbox">
+            <input type="checkbox" id="autoPollInput" />
+            自动轮询新邮件
+          </label>
+          <select id="pollIntervalSelect">
+            <option value="5">每 5 秒</option>
+            <option value="10" selected>每 10 秒</option>
+            <option value="20">每 20 秒</option>
+            <option value="30">每 30 秒</option>
+          </select>
+          <label class="checkbox">
+            <input type="checkbox" id="renderHtmlInput" checked />
+            HTML 正文渲染
+          </label>
+        </div>
+        <p id="status" class="status"></p>
+      </section>
+
+      <section class="grid">
+        <article class="panel">
+          <h2>邮件列表</h2>
+          <ul id="mailList" class="mail-list"></ul>
+        </article>
+
+        <article class="panel">
+          <h2>邮件详情</h2>
+          <p><strong>主题：</strong><span id="detailSubject">-</span></p>
+          <p><strong>发件人：</strong><span id="detailFrom">-</span></p>
+          <p><strong>收件人：</strong><span id="detailTo">-</span></p>
+          <div id="detailBody" class="detail-body"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <h2>发送邮件</h2>
+        <div class="compose">
+          <input id="toInput" placeholder="收件人邮箱" />
+          <input id="subjectInput" placeholder="主题" />
+          <textarea id="bodyInput" rows="8" placeholder="正文"></textarea>
+          <label class="checkbox">
+            <input type="checkbox" id="isHtmlInput" />
+            按 HTML 发送
+          </label>
+          <button id="sendBtn" class="btn btn-primary">发送</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="/public/mailbox.js"></script>
+  </body>
+  </html>

@@ -77,6 +77,7 @@ class MailSlurpAdapter extends DomainRegistrationAdapter {
 
     return {
       account: response.emailAddress || requestedAddress,
+      inboxId: response.id || "",
       password: generatedPassword,
       provider: this.definition.label,
       mode: `mailslurp-${mode}`,

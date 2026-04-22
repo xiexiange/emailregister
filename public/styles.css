@@ -69,6 +69,18 @@ h1 {
   box-shadow: var(--shadow);
 }
 
+.mailbox-link {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--accent-dark);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mailbox-link:hover {
+  text-decoration: underline;
+}
+
 .field {
   display: grid;
   gap: 10px;

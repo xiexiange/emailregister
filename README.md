@@ -17,6 +17,17 @@ Open:
 http://localhost:3000
 ```
 
+MailSlurp mailbox UI:
+
+```text
+http://localhost:3000/mailbox
+```
+
+Mailbox features:
+
+- Auto polling for new emails (5/10/20/30 seconds)
+- HTML body rendering toggle with basic client-side sanitization
+
 ## Architecture
 
 - `public/`: Frontend page and interaction.
@@ -71,3 +82,5 @@ MAILSLURP_FALLBACK_TO_POOL=true
 
 - MailSlurp mailbox access is API-key based. The `password` field shown by this demo is a generated placeholder for your UI contract.
 - If you need real mailbox protocol credentials (IMAP/SMTP), add a second API call after inbox creation to fetch protocol access details.
+- The mailbox page calls backend proxy APIs under `/api/mailslurp/*` so your API key stays server-side.
+- Outbound sending may require a paid MailSlurp plan. If free plan blocks sending, inbox listing and email receiving can still work.

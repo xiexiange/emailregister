@@ -1,0 +1,163 @@
+:root {
+  --bg: #f5efe6;
+  --surface: #fffbf5;
+  --text: #1f2937;
+  --line: #e5dccf;
+  --muted: #6b7280;
+  --accent: #c2410c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  color: var(--text);
+  background: linear-gradient(140deg, #f1e4d3, #f7f4ee 48%, #e8f1ef);
+}
+
+.layout {
+  width: min(1100px, calc(100% - 28px));
+  margin: 26px auto 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topbar h1 {
+  margin: 0;
+}
+
+.link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+input,
+textarea,
+select,
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 38px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+input,
+textarea,
+select {
+  background: #fff;
+}
+
+input,
+select {
+  min-width: 250px;
+}
+
+.btn {
+  cursor: pointer;
+  background: #fff;
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.mail-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.mail-item {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.mail-item:hover {
+  background: #fff4ea;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.detail-body {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  min-height: 160px;
+  padding: 10px;
+  background: #fff;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.compose {
+  display: grid;
+  gap: 10px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#pollIntervalSelect {
+  min-width: 120px;
+}
+
+.detail-body a {
+  color: #9a3412;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
