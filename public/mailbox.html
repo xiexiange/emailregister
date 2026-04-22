@@ -45,6 +45,15 @@
 
       <section class="grid">
         <article class="panel">
+          <div class="platform-bar">
+            <button id="registerCodexBtn" class="btn btn-primary">codex</button>
+            <button id="registerWindsurfBtn" class="btn" disabled>windsurf</button>
+            <button id="registerKiroBtn" class="btn" disabled>kiro</button>
+            <button id="registerCursorBtn" class="btn" disabled>cursor</button>
+            <button id="registerCopilotBtn" class="btn" disabled>copilot</button>
+          </div>
+          <p class="muted small" id="registrationProfileText">点击 codex 会生成注册资料并打开目标站点。</p>
+          <pre id="codexResultText" class="result-console">等待执行 codex 第一步本地测试请求。</pre>
           <h2>邮件列表</h2>
           <ul id="mailList" class="mail-list"></ul>
         </article>

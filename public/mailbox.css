@@ -127,6 +127,17 @@ select {
   color: var(--muted);
 }
 
+.small {
+  font-size: 13px;
+}
+
+.platform-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 .detail-body {
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -154,6 +165,19 @@ select {
 
 .detail-body a {
   color: #9a3412;
+}
+
+.result-console {
+  margin: 0 0 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--muted);
+  max-height: 220px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 @media (max-width: 860px) {

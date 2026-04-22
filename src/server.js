@@ -1,4 +1,5 @@
 const http = require("node:http");
+const https = require("node:https");
 const fs = require("node:fs");
 const path = require("node:path");
 const { getDomainDefinitions } = require("./services/domainRegistry");
@@ -107,6 +108,86 @@ function normalizeInboxList(result) {
   }));
 }
 
+function getCodexAuthConfig() {
+  const continueUrl =
+    process.env.CODEX_AUTH_CONTINUE_URL || "https://localhost/api/accounts/authorize/continue";
+  const allowSelfSigned =
+    String(process.env.CODEX_AUTH_ALLOW_SELF_SIGNED || "true").toLowerCase() === "true";
+  const cookie = process.env.CODEX_AUTH_COOKIE || "";
+  const sentinelToken = process.env.CODEX_AUTH_OPENAI_SENTINEL_TOKEN || "";
+
+  return {
+    continueUrl,
+    allowSelfSigned,
+    cookie,
+    sentinelToken
+  };
+}
+
+function sendJsonRequest(targetUrl, options = {}) {
+  return new Promise((resolve, reject) => {
+    const url = new URL(targetUrl);
+    const transport = url.protocol === "https:" ? https : http;
+    const body = options.body ? JSON.stringify(options.body) : "";
+
+    const requestOptions = {
+      method: options.method || "GET",
+      hostname: url.hostname,
+      port: url.port || (url.protocol === "https:" ? 443 : 80),
+      path: `${url.pathname}${url.search}`,
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(body),
+        ...(options.headers || {})
+      }
+    };
+
+    if (url.protocol === "https:") {
+      requestOptions.rejectUnauthorized = options.rejectUnauthorized !== false;
+    }
+
+    const outgoing = transport.request(requestOptions, (incoming) => {
+      let raw = "";
+
+      incoming.on("data", (chunk) => {
+        raw += chunk;
+      });
+
+      incoming.on("end", () => {
+        let payload = null;
+
+        if (raw) {
+          try {
+            payload = JSON.parse(raw);
+          } catch (error) {
+            payload = { raw };
+          }
+        }
+
+        if (incoming.statusCode < 200 || incoming.statusCode >= 300) {
+          const failure = new Error(
+            (payload && payload.message) || `Request failed with status ${incoming.statusCode}`
+          );
+          failure.status = incoming.statusCode;
+          failure.payload = payload;
+          reject(failure);
+          return;
+        }
+
+        resolve(payload);
+      });
+    });
+
+    outgoing.on("error", reject);
+
+    if (body) {
+      outgoing.write(body);
+    }
+
+    outgoing.end();
+  });
+}
+
 function sendFile(response, filePath) {
   const stream = fs.createReadStream(filePath);
 
@@ -168,6 +249,64 @@ const server = http.createServer(async (request, response) => {
     } catch (error) {
       sendJson(response, error.status || 500, {
         message: error.message || "Unexpected error"
+      });
+    }
+    return;
+  }
+
+  if (request.method === "POST" && requestUrl.pathname === "/api/codex/authorize-continue") {
+    try {
+      const body = await readRequestBody(request);
+      const email = String(body.email || "").trim();
+
+      if (!email) {
+        const error = new Error("email is required");
+        error.status = 400;
+        throw error;
+      }
+
+      const { continueUrl, allowSelfSigned, cookie, sentinelToken } = getCodexAuthConfig();
+      const result = await sendJsonRequest(continueUrl, {
+        method: "POST",
+        body: {
+          username: {
+            value: email,
+            kind: "email"
+          },
+          screen_hint: "login_or_signup"
+        },
+        headers: cookie
+          ? {
+              Cookie: cookie,
+              ...(sentinelToken
+                ? {
+                    "Openai-Sentinel-Token": sentinelToken
+                  }
+                : {})
+            }
+          : sentinelToken
+            ? {
+                "Openai-Sentinel-Token": sentinelToken
+              }
+            : {},
+        rejectUnauthorized: !allowSelfSigned
+      });
+
+      sendJson(response, 200, {
+        success: true,
+        request: {
+          username: {
+            value: email,
+            kind: "email"
+          },
+          screen_hint: "login_or_signup"
+        },
+        result
+      });
+    } catch (error) {
+      sendJson(response, error.status || 500, {
+        message: `Failed to call local authorize continue: ${error.message || "unknown error"}`,
+        payload: error.payload || null
       });
     }
     return;

@@ -8,6 +8,9 @@ const pollIntervalSelect = document.getElementById("pollIntervalSelect");
 const renderHtmlInput = document.getElementById("renderHtmlInput");
 const statusText = document.getElementById("status");
 const mailList = document.getElementById("mailList");
+const registerCodexBtn = document.getElementById("registerCodexBtn");
+const registrationProfileText = document.getElementById("registrationProfileText");
+const codexResultText = document.getElementById("codexResultText");
 const detailSubject = document.getElementById("detailSubject");
 const detailFrom = document.getElementById("detailFrom");
 const detailTo = document.getElementById("detailTo");
@@ -36,6 +39,97 @@ function renderInboxOptions() {
   if (inboxes.length > 0) {
     selectedInboxId = inboxes[0].id;
     inboxSelect.value = selectedInboxId;
+  }
+}
+
+function getSelectedInboxEmail() {
+  const match = inboxes.find((item) => item.id === selectedInboxId);
+  return match ? String(match.emailAddress || "").trim() : "";
+}
+
+function randomLetters(min, max) {
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const length = Math.floor(Math.random() * (max - min + 1)) + min;
+  let value = "";
+  for (let i = 0; i < length; i += 1) {
+    value += letters[Math.floor(Math.random() * letters.length)];
+  }
+  return value;
+}
+
+function randomNameProfile() {
+  const family = randomLetters(10, 13);
+  const given = randomLetters(5, 7);
+  const cap = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+  return {
+    familyName: cap(family),
+    givenName: cap(given),
+    fullName: `${cap(given)} ${cap(family)}`
+  };
+}
+
+function saveRegistrationProfile(profile) {
+  try {
+    localStorage.setItem("codex_registration_profile", JSON.stringify(profile));
+  } catch (error) {
+    // ignore storage failures
+  }
+}
+
+async function startCodexRegistration() {
+  const email = getSelectedInboxEmail() || emailInput.value.trim();
+
+  if (!email) {
+    setStatus("请先绑定一个邮箱，再发起 codex 测试请求。");
+    return;
+  }
+
+  const name = randomNameProfile();
+  const profile = {
+    platform: "codex",
+    email,
+    familyName: name.familyName,
+    givenName: name.givenName,
+    fullName: name.fullName,
+    generatedAt: new Date().toISOString()
+  };
+
+  saveRegistrationProfile(profile);
+  registrationProfileText.textContent = `资料已生成: email=${profile.email}, given=${profile.givenName}, family=${profile.familyName}`;
+  codexResultText.textContent = "正在请求本地 authorize/continue...";
+  registerCodexBtn.disabled = true;
+
+  const text = `platform: codex\nemail: ${profile.email}\ngiven_name: ${profile.givenName}\nfamily_name: ${profile.familyName}\nfull_name: ${profile.fullName}`;
+
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (error) {
+    // ignore clipboard failure
+  }
+
+  try {
+    const response = await fetch("/api/codex/authorize-continue", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: profile.email
+      })
+    });
+    const payload = await response.json();
+
+    if (!response.ok) {
+      throw new Error(payload.message || "codex 第一步请求失败");
+    }
+
+    codexResultText.textContent = JSON.stringify(payload, null, 2);
+    setStatus("codex 第一步本地测试请求已完成。");
+  } catch (error) {
+    codexResultText.textContent = error.message || "codex 第一步请求失败";
+    setStatus(error.message || "codex 第一步请求失败。");
+  } finally {
+    registerCodexBtn.disabled = false;
   }
 }
 
@@ -299,6 +393,7 @@ refreshEmailsBtn.addEventListener("click", refreshEmails);
 sendBtn.addEventListener("click", sendEmail);
 autoPollInput.addEventListener("change", updatePollingState);
 pollIntervalSelect.addEventListener("change", updatePollingState);
+registerCodexBtn.addEventListener("click", startCodexRegistration);
 renderHtmlInput.addEventListener("change", () => {
   if (currentEmailDetail) {
     renderEmailBody(currentEmailDetail);
